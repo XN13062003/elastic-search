@@ -2,19 +2,6 @@
 version: '3.9'
 
 services:
-  mysql:
-    image: mysql:8.0
-    container_name: mysql_elastic
-    ports:
-      - '3306:3306'
-    environment:
-      MYSQL_DATABASE: web_da
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: 123456789
-      MYSQL_ROOT_PASSWORD: root_password
-    volumes:
-      - mysql_elastic:/var/lib/mysql
-
   elasticsearch:
     container_name: es-container
     image: docker.elastic.co/elasticsearch/elasticsearch:8.15.2
