@@ -60,19 +60,26 @@ const SearchComponent: React.FC = () => {
                 {searchResults.length > 0 ? (
                     <ul className="space-y-4">
                         {searchResults.map((result, index) => (
-                            <li key={index} className="border border-gray-300 p-4 rounded-md shadow-sm">
-                                <h3 className="text-lg font-bold">{result.title}</h3>
-                                <p className="text-gray-600">{result.description}</p>
-                                <p className="text-gray-600">{result.content}</p>
-                                <p className="text-sm text-gray-500">Ngày: {result.date}</p>
+                            <li key={index} className="relative border border-gray-300 p-6 rounded-md shadow-md">
                                 <a
                                     href={result.link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="mt-2 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                                    className="absolute bottom-2 right-2 mr-6 text-blue-600 hover:underline"
                                 >
                                     Xem chi tiết
                                 </a>
+                                <h3 className="text-lg font-bold text-left">{result.title}</h3>
+                                <p className="text-gray-600 text-left">{result.description.match(/[^.!?]*[.!?]/)?.[0]}</p>
+                                <p className="text-gray-600 text-left">
+                                    <span className="font-bold mr-1 ">Nội dung:</span>
+                                    {result.content
+                                        .match(/[^.!?]*[.!?]/g) // Tìm tất cả các câu
+                                        ?.slice(0, 3) // Lấy 3 câu đầu tiên
+                                        .join(' ')}
+                                </p>
+
+                                <p className="text-gray-700 text-left"><span className="font-bold mr-1 ">Ngày, giờ đăng tin:</span> {result.date}</p>
                             </li>
                         ))}
                     </ul>
@@ -80,6 +87,7 @@ const SearchComponent: React.FC = () => {
                     <p className="text-gray-500">Không có kết quả tìm kiếm nào.</p>
                 )}
             </div>
+
         </div>
     );
 };

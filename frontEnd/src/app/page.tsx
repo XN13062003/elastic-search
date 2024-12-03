@@ -1,18 +1,16 @@
 'use client'
 import { useEffect, useState } from 'react';
 import SearchComponent from "@/app/search-bar";
-import CardComponent from "@/app/card"; // Đảm bảo bạn đã tạo component CardComponent
-
 interface SearchResult {
     title: string;
     description: string;
     date: string;
     link: string;
-    paragram: string;
+    content: string;
 }
 
 const Home = () => {
-    const [searchResults, setSearchResults] = useState<SearchResult[]>([]); // Sử dụng kiểu SearchResult
+    const [, setSearchResults] = useState<SearchResult[]>([]); // Sử dụng kiểu SearchResult
 
     useEffect(() => {
         const savedResults = sessionStorage.getItem('searchResults');
@@ -28,16 +26,6 @@ const Home = () => {
                 <SearchComponent />
             </div>
 
-            {/* Hiển thị kết quả tìm kiếm */}
-            {searchResults.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {searchResults.map((result, index) => (
-                        <CardComponent key={index} {...result} />
-                    ))}
-                </div>
-            ) : (
-                <p className="text-center text-gray-600">Không có kết quả tìm kiếm.</p>
-            )}
         </main>
     );
 };

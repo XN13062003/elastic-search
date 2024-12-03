@@ -37,7 +37,7 @@ const deleteIndex = async () => {
   }
 }
 
-const createIndex = async (res,req) => {
+const createIndex = async (req, res) => {
   try {
     const indexExists = await esClient.indices.exists({ index: "news" });
     if (!indexExists) {
@@ -225,10 +225,15 @@ const getAllData = async (req, res) => {
 
 const addElasticCLB = async (req,res) => {
   try {
-    const data = require("./dataCLB.json");
-    if (data.length === 0) {
+    const documents = require("./dataCLB.json");
+    if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
+    const data = documents.filter((doc, index, self) =>
+            index === self.findIndex((t) =>
+                t.title === doc.title && t.description === doc.description && t.date === doc.date
+            )
+    );
 
     const batchSize = 2;
     for (let i = 0; i < data.length; i += batchSize) {
