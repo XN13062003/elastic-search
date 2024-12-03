@@ -225,15 +225,10 @@ const getAllData = async (req, res) => {
 
 const addElasticCLB = async (req,res) => {
   try {
-    const documents = require("./dataCLB.json");
+    const data = require("./dataCLB.json");
     if (data.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
-    const data = documents.filter((doc, index, self) =>
-        index === self.findIndex((t) =>
-          t.title === doc.title && t.description === doc.description && t.date === doc.date
-        )
-    );
 
     const batchSize = 2;
     for (let i = 0; i < data.length; i += batchSize) {
