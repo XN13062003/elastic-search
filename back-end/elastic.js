@@ -1,4 +1,5 @@
 const ES = require("@elastic/elasticsearch");
+const documents = require("./data/CLB.json");
 
 const elasticConfig = {
   ip: process.env.ELASTIC_HOST || "localhost",
@@ -37,7 +38,7 @@ const deleteIndex = async () => {
   }
 }
 
-const createIndex = async (res,req) => {
+const createIndex = async (req, res) => {
   try {
     const indexExists = await esClient.indices.exists({ index: "news" });
     if (!indexExists) {
@@ -124,6 +125,21 @@ const createIndex = async (res,req) => {
           },
           mappings: {
             properties: {
+              title: {
+                type: "text",
+                fields: {
+                  origin_viet: {
+                    type: "text",
+                    analyzer: "origin_viet_analyzer",
+                    term_vector: "with_positions_offsets"
+                  },
+                  non_viet: {
+                    type: "text",
+                    analyzer: "non_viet_analyzer",
+                    term_vector: "with_positions_offsets"
+                  }
+                }
+              },
               description: {
                 type: "text",
                 fields: {
@@ -217,18 +233,540 @@ const getAllData = async (req, res) => {
   }
 };
 
+const addElasticnhom11 = async (req,res) => {
+  try {
+    const documents = require("./data/NHOM11.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.title === doc.title && t.description === doc.description
+        )
+    );
 
-// doc file dataCLB.json
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.title,
+            description: item.description,
+            date: "NHOM11",
+            link: "NHOM11",
+            content: item.code
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+const addElasticnhomacv1 = async (req,res) => {
+  try {
+    const documents = require("./data/ACV1.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.title === doc.title && t.description === doc.description
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.title,
+            description: item.description,
+            date: "ACV",
+            link: item.link,
+            content: "ACV"
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+const addElasticnhomacv = async (req,res) => {
+  try {
+    const documents = require("./data/ACV.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.title === doc.title && t.description === doc.description
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.title,
+            description: item.description,
+            date: "ACV",
+            link: item.link,
+            content: item.content
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+const addElasticnhom5 = async (req,res) => {
+  try {
+    const documents = require("./data/NHOM5.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.song === doc.song && t.artists === doc.artists
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.song,
+            description: item.artists,
+            date:"NHOM5",
+            link: item.link,
+            content: item.lyrics
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+const addElasticTHK = async (req,res) => {
+  try {
+    const documents = require("./data/BK-THK.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.title === doc.title && t.description === doc.description
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.title,
+            description: item.description,
+            date: "THK",
+            link: item.link,
+            content: "THK"
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+const addElasticSOL3 = async (req,res) => {
+  try {
+    const documents = require("./data/SOL3.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.noidung === doc.noidung && t.tendemuc === doc.tendemuc
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.tenchude,
+            description: item.tenchuong,
+            date: "SOL3",
+            link: "SOL3",
+            content: item.noidung
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+const addElasticDMA = async (req,res) => {
+  try {
+    const documents = require("./data/DMA.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.division_description === doc.division_description && t.description === doc.description
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.division_description,
+            description: item.description,
+            date: "DMA",
+            link: "DMA",
+            content: item._class_description
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+const addElasticOT3 = async (req,res) => {
+  try {
+    const documents = require("./data/OT3.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.Title === doc.Title && t.Content === doc.Content
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.Title,
+            description: item.Author,
+            date: "OT3",
+            link: item.Link,
+            content: item.Content
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+const addElasticKND = async (req,res) => {
+  try {
+    const documents = require("./data/KND.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.meaning === doc.meaning && t.content === doc.content
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.type,
+            description: item.meaning,
+            date: "KND",
+            link: "KND",
+            content: item.content
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+const addElasticNhom2 = async (req,res) => {
+  try {
+    const documents = require("./data/NHOM2.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.title === doc.title && t.description === doc.description
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.title,
+            description: item.description,
+            date: item.timeAgo,
+            link: item.link,
+            content: item.keywords
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+
+// doc file CLB.json
+
+const addElasticAnimal = async (req,res) => {
+  try {
+    const documents = require("./data/PHM.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.title === doc.title && t.description === doc.description
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.categories,
+            description: item.description,
+            date: "PHM",
+            link: item.url,
+            content: item.content
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
+
+
+const addElasticnhom4 = async (req,res) => {
+  try {
+    const documents = require("./data/NHOM4.json");
+    if (documents.length === 0) {
+      return res.status(400).json({ message: 'Data is empty' });
+    }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.title === doc.title && t.description === doc.description
+        )
+    );
+
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+        await esClient.index({
+          index: 'news',
+          body: {
+            title: item.title,
+            description: item.description,
+            date: item.date,
+            link: item.url,
+            content: item.content
+          },
+        });
+      });
+      await Promise.allSettled(promises);
+    }
+    return res.status(200).json({
+      statusCode: 200,
+      message: 'Data added successfully',
+    });
+
+  } catch (e) {
+    console.error('Error:', e);
+    return res.status(500).json({
+      statusCode: 500,
+      message: 'Internal Server Error',
+    });
+  }
+};
 
 
 
 
 const addElasticCLB = async (req,res) => {
   try {
-    const data = require("./dataCLB.json");
-    if (data.length === 0) {
+    const documents = require("./data/CLB.json");
+    if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.title === doc.title && t.description === doc.description && t.date === doc.date
+        )
+    );
 
     const batchSize = 2;
     for (let i = 0; i < data.length; i += batchSize) {
@@ -290,14 +828,18 @@ const search = async (req, res) => {
     const result = await esClient.search({
       index: "news",
       body: {
-        query: { // Wrap `multi_match` inside `query`
+        query: {
           multi_match: {
             query: text,
-            fields: ["description", "content"], // Fields to search in
+            fields: [
+              "description^3", // Ưu tiên cao nhất cho 'description'
+              "content^2",     // Ưu tiên trung bình cho 'content'
+              "title"          // Ưu tiên thấp nhất cho 'title'
+            ],
           },
         },
       },
-      size: 10, // Limit the number of results
+      size: 10, // Giới hạn số kết quả
     });
     const mapData = result.hits.hits.map((item) =>{
       return {
@@ -327,5 +869,4 @@ const search = async (req, res) => {
 
 
 
-module.exports = {esClient,createIndex,deleteIndex, addElasticCLB, getAllData, search ,deleteDocument };
-
+module.exports = {esClient,createIndex,addElasticnhom4,deleteIndex, addElasticCLB, getAllData, search ,deleteDocument ,addElasticAnimal,addElasticNhom2,addElasticKND,addElasticOT3,addElasticDMA,addElasticTHK,addElasticSOL3,addElasticnhom5,addElasticnhomacv,addElasticnhom11,addElasticnhomacv1 };
