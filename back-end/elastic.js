@@ -1,5 +1,5 @@
 const ES = require("@elastic/elasticsearch");
-const documents = require("./data/CLB.json");
+const documents = require("./dataAll/CLB.json");
 
 const elasticConfig = {
   ip: process.env.ELASTIC_HOST || "localhost",
@@ -38,6 +38,192 @@ const deleteIndex = async () => {
   }
 }
 
+// const createIndex = async (req, res) => {
+//   try {
+//     const indexExists = await esClient.indices.exists({ index: "news" });
+//     if (!indexExists) {
+//       await esClient.indices.create({
+//         index: "news",
+//         body: {
+//           settings: {
+//             analysis: {
+//               filter: {
+//                 my_stop: {
+//                   type: "stop",
+//                   stopwords: [
+//                     "và", "là", "của", "các", "một", "những", "với", "được", "trong", "khi", "đã", "cho", "này", "bởi", "từ", "ra", "vì", "như", "lại", "nên", "thì", "lên", "xuống", "để", "thế", "rất", "hay", "rằng", "mình", "đó", "gì", "đây", "nào", "này", "ở", "ấy", "hơn", "nhiều"
+//                   ]
+//                 },
+//                 my_bigram_filter: {
+//                   type: "shingle",
+//                   min_shingle_size: 2,
+//                   max_shingle_size: 2,
+//                   output_unigrams: false
+//                 },
+//                 my_trigram_filter: {
+//                   type: "shingle",
+//                   min_shingle_size: 3,
+//                   max_shingle_size: 3,
+//                   output_unigrams: false
+//                 },
+//                 my_ngram_filter: {
+//                   type: "ngram",
+//                   min_ngram: 1,
+//                   max_ngram: 10
+//                 },
+//                 remove_special_characters_filter: {
+//                   type: "pattern_replace",
+//                   pattern: "[\\n\\r]+",
+//                   replacement: " "
+//                 },
+//                 punctuation_removal: {
+//                   type: "pattern_replace",
+//                   pattern: "[\\p{Punct}]",
+//                   replacement: " "
+//                 }
+//               },
+//               analyzer: {
+//                 my_analyzer: {
+//                   type: "custom",
+//                   tokenizer: "standard",
+//                   filter: [
+//                     "lowercase",
+//                     "my_stop",
+//                     "remove_special_characters_filter",
+//                     "punctuation_removal"
+//                   ]
+//                 },
+//                 my_bigram_analyzer: {
+//                   type: "custom",
+//                   tokenizer: "whitespace",
+//                   filter: [
+//                     "lowercase",
+//                     "my_stop",
+//                     "remove_special_characters_filter",
+//                     "punctuation_removal",
+//                     "my_bigram_filter"
+//                   ]
+//                 },
+//                 my_trigram_analyzer: {
+//                   type: "custom",
+//                   tokenizer: "whitespace",
+//                   filter: [
+//                     "lowercase",
+//                     "my_stop",
+//                     "remove_special_characters_filter",
+//                     "punctuation_removal",
+//                     "my_trigram_filter"
+//                   ]
+//                 }
+//               }
+//             },
+//             similarity: {
+//               my_bm25: {
+//                 type: "BM25",
+//                 k1: 1.2,
+//                 b: 0.75
+//               },
+//               scripted_tfidf: {
+//                 type: "scripted",
+//                 script: {
+//                   source: `
+//                     double docTf = (doc.freq > 0) ? 1 + Math.log(doc.freq) : 0;
+//                     double docNorm = (doc.length > 0) ? 1 / Math.sqrt(doc.length) : 1;
+//                     double queryTf = (term.totalTermFreq > 0) ? 1 + Math.log(term.totalTermFreq) : 0;
+//                     double idf = (term.docFreq > 0) ? Math.log((field.docCount + 1.0) / term.docFreq) : 0;
+//                     double queryNorm = 1 / Math.sqrt(field.sumDocFreq > 0 ? field.sumDocFreq : 1);
+//                     return docTf * docNorm * queryTf * idf * queryNorm;
+//                   `
+//                 }
+//               },
+//             }
+//           },
+//           mappings: {
+//             properties: {
+//               title: {
+//                 type: "text",
+//                 analyzer: "my_analyzer",
+//                 fields: {
+//                   keyword: {
+//                     type: "keyword"
+//                   },
+//                   bi_grams: {
+//                     type: "text",
+//                     analyzer: "my_bigram_analyzer",
+//                     similarity: "my_bm25"
+//                   },
+//                   tri_grams: {
+//                     type: "text",
+//                     analyzer: "my_trigram_analyzer",
+//                     similarity: "my_bm25"
+//                   }
+//                 },
+//                 similarity: "my_bm25"
+//               },
+//               description: {
+//                 type: "text",
+//                 analyzer: "my_analyzer",
+//                 fields: {
+//                   keyword: {
+//                     type: "keyword"
+//                   },
+//                   bi_grams: {
+//                     type: "text",
+//                     analyzer: "my_bigram_analyzer",
+//                     similarity: "my_bm25"
+//                   },
+//                   tri_grams: {
+//                     type: "text",
+//                     analyzer: "my_trigram_analyzer",
+//                     similarity: "my_bm25"
+//                   }
+//                 },
+//                 similarity: "my_bm25"
+//               },
+//               content: {
+//                 type: "text",
+//                 analyzer: "my_analyzer",
+//                 fields: {
+//                   keyword: {
+//                     type: "keyword"
+//                   },
+//                   bi_grams: {
+//                     type: "text",
+//                     analyzer: "my_bigram_analyzer",
+//                     similarity: "my_bm25"
+//                   },
+//                   tri_grams: {
+//                     type: "text",
+//                     analyzer: "my_trigram_analyzer",
+//                     similarity: "my_bm25"
+//                   }
+//                 },
+//                 similarity: "my_bm25"
+//               }
+//             }
+//           }
+//         }
+//       });
+//       console.log("Index 'news' created successfully");
+//       return res.status(200).json({
+//         statusCode: 200,
+//         message: 'Index created successfully',
+//       });
+//     } else {
+//       console.log("Index 'news' already exists");
+//       return res.status(200).json({
+//         statusCode: 200,
+//         message: 'Index already exists',
+//       });
+//     }
+//   } catch (err) {
+//     console.log("Error creating index", err);
+//     return res.status(500).json({
+//       statusCode: 500,
+//       message: 'Internal Server Error',
+//     });
+//   }
+// };
 const createIndex = async (req, res) => {
   try {
     const indexExists = await esClient.indices.exists({ index: "news" });
@@ -48,77 +234,60 @@ const createIndex = async (req, res) => {
           settings: {
             analysis: {
               char_filter: {
-                replace_a: {
-                  type: "pattern_replace",
-                  pattern: "[àáạảãâầấậẩẫăằắặẳẵ]",
-                  replacement: "a"
-                },
-                replace_e: {
-                  type: "pattern_replace",
-                  pattern: "[èéẹẻẽêềếệểễ]",
-                  replacement: "e"
-                },
-                replace_i: {
-                  type: "pattern_replace",
-                  pattern: "[ìíịỉĩ]",
-                  replacement: "i"
-                },
-                replace_o: {
-                  type: "pattern_replace",
-                  pattern: "[òóọỏõôồốộổỗơờớợởỡ]",
-                  replacement: "o"
-                },
-                replace_u: {
-                  type: "pattern_replace",
-                  pattern: "[ùúụủũưừứựửữ]",
-                  replacement: "u"
-                },
-                replace_y: {
-                  type: "pattern_replace",
-                  pattern: "[ỳýỵỷỹ]",
-                  replacement: "y"
-                },
-                replace_d: {
-                  type: "pattern_replace",
-                  pattern: "[đ]",
-                  replacement: "d"
-                }
+                replace_a: { type: "pattern_replace", pattern: "[àáạảãâầấậẩẫăằắặẳẵ]", replacement: "a" },
+                replace_e: { type: "pattern_replace", pattern: "[èéẹẻẽêềếệểễ]", replacement: "e" },
+                replace_i: { type: "pattern_replace", pattern: "[ìíịỉĩ]", replacement: "i" },
+                replace_o: { type: "pattern_replace", pattern: "[òóọỏõôồốộổỗơờớợởỡ]", replacement: "o" },
+                replace_u: { type: "pattern_replace", pattern: "[ùúụủũưừứựửữ]", replacement: "u" },
+                replace_y: { type: "pattern_replace", pattern: "[ỳýỵỷỹ]", replacement: "y" },
+                replace_d: { type: "pattern_replace", pattern: "[đ]", replacement: "d" }
               },
               filter: {
-                shingle_filter: {
-                  type: "shingle",
-                  min_shingle_size: 2,
-                  max_shingle_size: 2,
-                  output_unigrams: false
-                }
+                my_stop: { type: "stop", stopwords: ["và", "là", "của", "các", "một", "những", "với", "được", "trong"] },
+                shingle_filter: { type: "shingle", min_shingle_size: 2, max_shingle_size: 2, output_unigrams: false },
+                my_bigram_filter: { type: "shingle", min_shingle_size: 2, max_shingle_size: 2, output_unigrams: false },
+                my_trigram_filter: { type: "shingle", min_shingle_size: 3, max_shingle_size: 3, output_unigrams: false },
+                remove_special_characters_filter: { type: "pattern_replace", pattern: "[\\n\\r]+", replacement: " " },
+                punctuation_removal: { type: "pattern_replace", pattern: "[\\p{Punct}]", replacement: " " }
               },
               analyzer: {
-                origin_viet_analyzer: {
+                origin_viet_analyzer: { type: "custom", tokenizer: "whitespace", filter: ["lowercase", "shingle_filter"] },
+                non_viet_analyzer: {
                   type: "custom",
+                  char_filter: ["replace_a", "replace_e", "replace_i", "replace_o", "replace_u", "replace_y", "replace_d"],
                   tokenizer: "whitespace",
                   filter: ["lowercase", "shingle_filter"]
                 },
-                non_viet_analyzer: {
+                my_analyzer: {
                   type: "custom",
-                  char_filter: [
-                    "replace_a",
-                    "replace_e",
-                    "replace_i",
-                    "replace_o",
-                    "replace_u",
-                    "replace_y",
-                    "replace_d"
-                  ],
+                  tokenizer: "standard",
+                  filter: ["lowercase", "my_stop", "remove_special_characters_filter", "punctuation_removal"]
+                },
+                my_bigram_analyzer: {
+                  type: "custom",
                   tokenizer: "whitespace",
-                  filter: ["lowercase", "shingle_filter"]
+                  filter: ["lowercase", "my_stop", "remove_special_characters_filter", "punctuation_removal", "my_bigram_filter"]
+                },
+                my_trigram_analyzer: {
+                  type: "custom",
+                  tokenizer: "whitespace",
+                  filter: ["lowercase", "my_stop", "remove_special_characters_filter", "punctuation_removal", "my_trigram_filter"]
                 }
               }
             },
             similarity: {
+              my_bm25: { type: "BM25", k1: 1.2, b: 0.75 },
               lnc_ltc_similarity: {
                 type: "scripted",
                 script: {
-                  source: " double docTf = (doc.freq > 0) ? 1 + Math.log(doc.freq) : 0; double docNorm = (doc.length > 0) ? 1 / Math.sqrt(doc.length) : 1;double queryTf = (term.totalTermFreq > 0) ? 1 + Math.log(term.totalTermFreq) : 0; double idf = (term.docFreq > 0) ? Math.log((field.docCount + 1.0) / term.docFreq) : 0; double queryNorm = 1 / Math.sqrt(field.sumDocFreq > 0 ? field.sumDocFreq : 1); return docTf*docNorm*queryTf*idf*queryNorm"
+                  source: `
+                    double docTf = (doc.freq > 0) ? 1 + Math.log(doc.freq) : 0;
+                    double docNorm = (doc.length > 0) ? 1 / Math.sqrt(doc.length) : 1;
+                    double queryTf = (term.totalTermFreq > 0) ? 1 + Math.log(term.totalTermFreq) : 0;
+                    double idf = (term.docFreq > 0) ? Math.log((field.docCount + 1.0) / term.docFreq) : 0;
+                    double queryNorm = 1 / Math.sqrt(field.sumDocFreq > 0 ? field.sumDocFreq : 1);
+                    return docTf * docNorm * queryTf * idf * queryNorm;
+                  `
                 }
               }
             }
@@ -128,74 +297,50 @@ const createIndex = async (req, res) => {
               title: {
                 type: "text",
                 fields: {
-                  origin_viet: {
-                    type: "text",
-                    analyzer: "origin_viet_analyzer",
-                    term_vector: "with_positions_offsets"
-                  },
-                  non_viet: {
-                    type: "text",
-                    analyzer: "non_viet_analyzer",
-                    term_vector: "with_positions_offsets"
-                  }
-                }
+                  origin_viet: { type: "text", analyzer: "origin_viet_analyzer" },
+                  non_viet: { type: "text", analyzer: "non_viet_analyzer" },
+                  bigrams: { type: "text", analyzer: "my_bigram_analyzer" },
+                  trigrams: { type: "text", analyzer: "my_trigram_analyzer" }
+                },
+                similarity: "my_bm25"
               },
               description: {
                 type: "text",
                 fields: {
-                  origin_viet: {
-                    type: "text",
-                    analyzer: "origin_viet_analyzer",
-                    term_vector: "with_positions_offsets"
-                  },
-                  non_viet: {
-                    type: "text",
-                    analyzer: "non_viet_analyzer",
-                    term_vector: "with_positions_offsets"
-                  }
+                  origin_viet: { type: "text", analyzer: "origin_viet_analyzer" },
+                  non_viet: { type: "text", analyzer: "non_viet_analyzer" },
+                  bigrams: { type: "text", analyzer: "my_bigram_analyzer" },
+                  trigrams: { type: "text", analyzer: "my_trigram_analyzer" }
                 },
                 similarity: "lnc_ltc_similarity"
               },
               content: {
                 type: "text",
                 fields: {
-                  origin_viet: {
-                    type: "text",
-                    analyzer: "origin_viet_analyzer",
-                    term_vector: "with_positions_offsets"
-                  },
-                  non_viet: {
-                    type: "text",
-                    analyzer: "non_viet_analyzer",
-                    term_vector: "with_positions_offsets"
-                  }
-                }
+                  origin_viet: { type: "text", analyzer: "origin_viet_analyzer" },
+                  non_viet: { type: "text", analyzer: "non_viet_analyzer" },
+                  bigrams: { type: "text", analyzer: "my_bigram_analyzer" },
+                  trigrams: { type: "text", analyzer: "my_trigram_analyzer" }
+                },
+                similarity: "my_bm25"
               }
             }
           }
         }
       });
       console.log("Index 'news' created successfully");
-      return res.status(200).json({
-        statusCode: 200,
-        message: 'Index created successfully',
-      });
-
+      return res.status(200).json({ statusCode: 200, message: "Index created successfully" });
     } else {
       console.log("Index 'news' already exists");
-      return res.status(200).json({
-        statusCode: 200,
-        message: 'Index already exists',
-      });
+      return res.status(200).json({ statusCode: 200, message: "Index already exists" });
     }
   } catch (err) {
     console.log("Error creating index", err);
-    return res.status(500).json({
-      statusCode: 500,
-      message: 'Internal Server Error',
-    });
+    return res.status(500).json({ statusCode: 500, message: "Internal Server Error" });
   }
 };
+
+
 const getAllData = async (req, res) => {
   try {
     const data = await esClient.search({
@@ -233,9 +378,10 @@ const getAllData = async (req, res) => {
   }
 };
 
+
 const addElasticnhom11 = async (req,res) => {
   try {
-    const documents = require("./data/NHOM11.json");
+    const documents = require("./dataAll/NHOM11.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -278,7 +424,7 @@ const addElasticnhom11 = async (req,res) => {
 
 const addElasticnhomacv1 = async (req,res) => {
   try {
-    const documents = require("./data/ACV1.json");
+    const documents = require("./dataAll/ACV1.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -321,7 +467,7 @@ const addElasticnhomacv1 = async (req,res) => {
 
 const addElasticnhomacv = async (req,res) => {
   try {
-    const documents = require("./data/ACV.json");
+    const documents = require("./dataAll/ACV.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -364,7 +510,7 @@ const addElasticnhomacv = async (req,res) => {
 
 const addElasticnhom5 = async (req,res) => {
   try {
-    const documents = require("./data/NHOM5.json");
+    const documents = require("./dataAll/NHOM5.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -407,7 +553,7 @@ const addElasticnhom5 = async (req,res) => {
 
 const addElasticTHK = async (req,res) => {
   try {
-    const documents = require("./data/BK-THK.json");
+    const documents = require("./dataAll/BK-THK.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -450,7 +596,7 @@ const addElasticTHK = async (req,res) => {
 
 const addElasticSOL3 = async (req,res) => {
   try {
-    const documents = require("./data/SOL3.json");
+    const documents = require("./dataAll/SOL3.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -493,7 +639,7 @@ const addElasticSOL3 = async (req,res) => {
 
 const addElasticDMA = async (req,res) => {
   try {
-    const documents = require("./data/DMA.json");
+    const documents = require("./dataAll/DMA.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -536,7 +682,7 @@ const addElasticDMA = async (req,res) => {
 
 const addElasticOT3 = async (req,res) => {
   try {
-    const documents = require("./data/OT3.json");
+    const documents = require("./dataAll/OT3.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -579,7 +725,7 @@ const addElasticOT3 = async (req,res) => {
 
 const addElasticKND = async (req,res) => {
   try {
-    const documents = require("./data/KND.json");
+    const documents = require("./dataAll/KND.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -622,7 +768,7 @@ const addElasticKND = async (req,res) => {
 
 const addElasticNhom2 = async (req,res) => {
   try {
-    const documents = require("./data/NHOM2.json");
+    const documents = require("./dataAll/NHOM2.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -668,7 +814,7 @@ const addElasticNhom2 = async (req,res) => {
 
 const addElasticAnimal = async (req,res) => {
   try {
-    const documents = require("./data/PHM.json");
+    const documents = require("./dataAll/PHM.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -712,7 +858,7 @@ const addElasticAnimal = async (req,res) => {
 
 const addElasticnhom4 = async (req,res) => {
   try {
-    const documents = require("./data/NHOM4.json");
+    const documents = require("./dataAll/NHOM4.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
@@ -758,7 +904,7 @@ const addElasticnhom4 = async (req,res) => {
 
 const addElasticCLB = async (req,res) => {
   try {
-    const documents = require("./data/CLB.json");
+    const documents = require("./dataAll/CLB.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
