@@ -28,6 +28,7 @@ const crawlController = require('./crawl');
 
 
 crawlController.cronJob.start();
+crawlController.cronJobCrawl.start();
 
 
 

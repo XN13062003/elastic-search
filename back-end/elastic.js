@@ -38,192 +38,6 @@ const deleteIndex = async () => {
   }
 }
 
-// const createIndex = async (req, res) => {
-//   try {
-//     const indexExists = await esClient.indices.exists({ index: "news" });
-//     if (!indexExists) {
-//       await esClient.indices.create({
-//         index: "news",
-//         body: {
-//           settings: {
-//             analysis: {
-//               filter: {
-//                 my_stop: {
-//                   type: "stop",
-//                   stopwords: [
-//                     "và", "là", "của", "các", "một", "những", "với", "được", "trong", "khi", "đã", "cho", "này", "bởi", "từ", "ra", "vì", "như", "lại", "nên", "thì", "lên", "xuống", "để", "thế", "rất", "hay", "rằng", "mình", "đó", "gì", "đây", "nào", "này", "ở", "ấy", "hơn", "nhiều"
-//                   ]
-//                 },
-//                 my_bigram_filter: {
-//                   type: "shingle",
-//                   min_shingle_size: 2,
-//                   max_shingle_size: 2,
-//                   output_unigrams: false
-//                 },
-//                 my_trigram_filter: {
-//                   type: "shingle",
-//                   min_shingle_size: 3,
-//                   max_shingle_size: 3,
-//                   output_unigrams: false
-//                 },
-//                 my_ngram_filter: {
-//                   type: "ngram",
-//                   min_ngram: 1,
-//                   max_ngram: 10
-//                 },
-//                 remove_special_characters_filter: {
-//                   type: "pattern_replace",
-//                   pattern: "[\\n\\r]+",
-//                   replacement: " "
-//                 },
-//                 punctuation_removal: {
-//                   type: "pattern_replace",
-//                   pattern: "[\\p{Punct}]",
-//                   replacement: " "
-//                 }
-//               },
-//               analyzer: {
-//                 my_analyzer: {
-//                   type: "custom",
-//                   tokenizer: "standard",
-//                   filter: [
-//                     "lowercase",
-//                     "my_stop",
-//                     "remove_special_characters_filter",
-//                     "punctuation_removal"
-//                   ]
-//                 },
-//                 my_bigram_analyzer: {
-//                   type: "custom",
-//                   tokenizer: "whitespace",
-//                   filter: [
-//                     "lowercase",
-//                     "my_stop",
-//                     "remove_special_characters_filter",
-//                     "punctuation_removal",
-//                     "my_bigram_filter"
-//                   ]
-//                 },
-//                 my_trigram_analyzer: {
-//                   type: "custom",
-//                   tokenizer: "whitespace",
-//                   filter: [
-//                     "lowercase",
-//                     "my_stop",
-//                     "remove_special_characters_filter",
-//                     "punctuation_removal",
-//                     "my_trigram_filter"
-//                   ]
-//                 }
-//               }
-//             },
-//             similarity: {
-//               my_bm25: {
-//                 type: "BM25",
-//                 k1: 1.2,
-//                 b: 0.75
-//               },
-//               scripted_tfidf: {
-//                 type: "scripted",
-//                 script: {
-//                   source: `
-//                     double docTf = (doc.freq > 0) ? 1 + Math.log(doc.freq) : 0;
-//                     double docNorm = (doc.length > 0) ? 1 / Math.sqrt(doc.length) : 1;
-//                     double queryTf = (term.totalTermFreq > 0) ? 1 + Math.log(term.totalTermFreq) : 0;
-//                     double idf = (term.docFreq > 0) ? Math.log((field.docCount + 1.0) / term.docFreq) : 0;
-//                     double queryNorm = 1 / Math.sqrt(field.sumDocFreq > 0 ? field.sumDocFreq : 1);
-//                     return docTf * docNorm * queryTf * idf * queryNorm;
-//                   `
-//                 }
-//               },
-//             }
-//           },
-//           mappings: {
-//             properties: {
-//               title: {
-//                 type: "text",
-//                 analyzer: "my_analyzer",
-//                 fields: {
-//                   keyword: {
-//                     type: "keyword"
-//                   },
-//                   bi_grams: {
-//                     type: "text",
-//                     analyzer: "my_bigram_analyzer",
-//                     similarity: "my_bm25"
-//                   },
-//                   tri_grams: {
-//                     type: "text",
-//                     analyzer: "my_trigram_analyzer",
-//                     similarity: "my_bm25"
-//                   }
-//                 },
-//                 similarity: "my_bm25"
-//               },
-//               description: {
-//                 type: "text",
-//                 analyzer: "my_analyzer",
-//                 fields: {
-//                   keyword: {
-//                     type: "keyword"
-//                   },
-//                   bi_grams: {
-//                     type: "text",
-//                     analyzer: "my_bigram_analyzer",
-//                     similarity: "my_bm25"
-//                   },
-//                   tri_grams: {
-//                     type: "text",
-//                     analyzer: "my_trigram_analyzer",
-//                     similarity: "my_bm25"
-//                   }
-//                 },
-//                 similarity: "my_bm25"
-//               },
-//               content: {
-//                 type: "text",
-//                 analyzer: "my_analyzer",
-//                 fields: {
-//                   keyword: {
-//                     type: "keyword"
-//                   },
-//                   bi_grams: {
-//                     type: "text",
-//                     analyzer: "my_bigram_analyzer",
-//                     similarity: "my_bm25"
-//                   },
-//                   tri_grams: {
-//                     type: "text",
-//                     analyzer: "my_trigram_analyzer",
-//                     similarity: "my_bm25"
-//                   }
-//                 },
-//                 similarity: "my_bm25"
-//               }
-//             }
-//           }
-//         }
-//       });
-//       console.log("Index 'news' created successfully");
-//       return res.status(200).json({
-//         statusCode: 200,
-//         message: 'Index created successfully',
-//       });
-//     } else {
-//       console.log("Index 'news' already exists");
-//       return res.status(200).json({
-//         statusCode: 200,
-//         message: 'Index already exists',
-//       });
-//     }
-//   } catch (err) {
-//     console.log("Error creating index", err);
-//     return res.status(500).json({
-//       statusCode: 500,
-//       message: 'Internal Server Error',
-//     });
-//   }
-// };
 const createIndex = async (req, res) => {
   try {
     const indexExists = await esClient.indices.exists({ index: "news" });
@@ -913,7 +727,6 @@ const addElasticCLB = async (req,res) => {
           t.title === doc.title && t.description === doc.description && t.date === doc.date
         )
     );
-
     const batchSize = 2;
     for (let i = 0; i < data.length; i += batchSize) {
       const batch = data.slice(i, i + batchSize);
@@ -1022,22 +835,33 @@ const now = () => {
   return `${day}/${month}/${year}`; // Trả về theo định dạng DD/MM/YYYY
 };
 
-const addData = async (data) => {
+const addData = async (documents) => {
   try {
-    const today = now();
-    const dataRs = data.slice(0, -1);
-    const dataJson = JSON.parse(dataRs);
-    console.log("dataJson",dataJson);
-    await esClient.index({
-      index: 'news',
-      body: {
-        title: dataJson.title,
-        description: dataJson.description,
-        date: dataJson.date,
-        link: dataJson.link,
-        content: dataJson.paragram
-      },
-    });
+    const data = documents.filter((doc, index, self) =>
+        index === self.findIndex((t) =>
+          t.title === doc.title && t.description === doc.description && t.date === doc.date
+        )
+    );
+    const batchSize = 2;
+    for (let i = 0; i < data.length; i += batchSize) {
+      const batch = data.slice(i, i + batchSize);
+      const promises = batch.map(async (item) => {
+
+        if(item.date.slice(0,10).toString() === now().toString()){
+          await esClient.index({
+            index: 'news',
+            body: {
+              title: item.title,
+              description: item.description,
+              date: item.date,
+              link: item.link,
+              content: item.paragram
+            },
+          });
+        }
+      });
+      await Promise.allSettled(promises);
+    }
     console.log('Data added successfully');
     return true
   } catch (e) {
