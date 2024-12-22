@@ -1013,6 +1013,38 @@ const search = async (req, res) => {
   }
 };
 
+const now = () => {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, '0'); // Lấy ngày, thêm 0 nếu cần
+  const month = String(now.getMonth() + 1).padStart(2, '0'); // Tháng bắt đầu từ 0, nên +1
+  const year = now.getFullYear();
+
+  return `${day}/${month}/${year}`; // Trả về theo định dạng DD/MM/YYYY
+};
+
+const addData = async (data) => {
+  try {
+    const today = now();
+    const dataRs = data.slice(0, -1);
+    const dataJson = JSON.parse(dataRs);
+    await esClient.index({
+      index: 'news',
+      body: {
+        title: dataJson.title,
+        description: dataJson.description,
+        date: dataJson.date,
+        link: dataJson.link,
+        content: dataJson.paragram
+      },
+    });
+
+    return true
+  } catch (e) {
+    console.error('Error:', e);
+    return false
+  }
+}
 
 
-module.exports = {esClient,createIndex,addElasticnhom4,deleteIndex, addElasticCLB, getAllData, search ,deleteDocument ,addElasticAnimal,addElasticNhom2,addElasticKND,addElasticOT3,addElasticDMA,addElasticTHK,addElasticSOL3,addElasticnhom5,addElasticnhomacv,addElasticnhom11,addElasticnhomacv1 };
+
+module.exports = {addData,esClient,createIndex,addElasticnhom4,deleteIndex, addElasticCLB, getAllData, search ,deleteDocument ,addElasticAnimal,addElasticNhom2,addElasticKND,addElasticOT3,addElasticDMA,addElasticTHK,addElasticSOL3,addElasticnhom5,addElasticnhomacv,addElasticnhom11,addElasticnhomacv1 };

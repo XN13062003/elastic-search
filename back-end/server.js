@@ -27,7 +27,7 @@ app.use('/api/elastic', elasticRouter);
 const crawlController = require('./crawl');
 
 
-crawlController.crawl();
+crawlController.cronJob.start();
 
 
 

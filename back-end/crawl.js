@@ -4,22 +4,32 @@ const fs = require('fs');
 const { promisify } = require('util');
 const readline = require('readline');
 const stream = require('stream');
+const { addData } = require('./elastic');
+const cron = require('node-cron');
 
 const writeFileAsync = promisify(fs.writeFile);
 const appendFileAsync = promisify(fs.appendFile);
 
 const types = [2, 3, 6, 7, 10, 11, 12, 13, 16, 17];
 
+
 const crawl = async () => {
   try {
     const linkStream = fs.createWriteStream('link.txt', { flags: 'a', encoding: 'utf-8' });
+    let linkCount = 0;
+    const maxLinks = 50;
 
     for (const type of types) {
+      if (linkCount >= maxLinks) break;
       for (let i = 1; i <= 6; i++) {
+        if (linkCount >= maxLinks) break;
         const response = await axios.get(`https://tuoitre.vn/timeline/${type}/trang-${i}.htm`);
         const $ = cheerio.load(response.data);
         $('h3 a').each((_, element) => {
-          linkStream.write(`https://tuoitre.vn${$(element).attr('href')}\n`);
+          if (linkCount < maxLinks) {
+            linkStream.write(`https://tuoitre.vn${$(element).attr('href')}\n`);
+            linkCount++;
+          }
         });
       }
     }
@@ -69,6 +79,32 @@ const crawl = async () => {
   }
 }
 
+
+const cronJob =   cron.schedule('18 0 * * *', async () => {
+  try {
+    await crawl();
+    const dataStream = fs.createReadStream('data.json', { encoding: 'utf-8' });
+    const rl = readline.createInterface({
+      input: dataStream,
+      crlfDelay: Infinity
+    });
+
+    for await (const data of rl) {
+      try {
+        console.log('Adding data:', data);
+        await addData(data);
+      } catch (error) {
+        console.error('Error adding data:', error);
+      }
+    }
+    fs.unlinkSync('data.json');
+    fs.unlinkSync('link.txt');
+  } catch (error) {
+    console.error('Error:', error);
+  }
+});
+
 module.exports = {
-  crawl
+  crawl,
+  cronJob,
 }
