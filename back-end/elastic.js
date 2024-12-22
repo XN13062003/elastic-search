@@ -1027,6 +1027,7 @@ const addData = async (data) => {
     const today = now();
     const dataRs = data.slice(0, -1);
     const dataJson = JSON.parse(dataRs);
+    console.log("dataJson",dataJson);
     await esClient.index({
       index: 'news',
       body: {
@@ -1037,7 +1038,7 @@ const addData = async (data) => {
         content: dataJson.paragram
       },
     });
-
+    console.log('Data added successfully');
     return true
   } catch (e) {
     console.error('Error:', e);

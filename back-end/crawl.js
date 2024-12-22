@@ -17,7 +17,7 @@ const crawl = async () => {
   try {
     const linkStream = fs.createWriteStream('link.txt', { flags: 'a', encoding: 'utf-8' });
     let linkCount = 0;
-    const maxLinks = 50;
+    const maxLinks = 100;
 
     for (const type of types) {
       if (linkCount >= maxLinks) break;
@@ -80,7 +80,7 @@ const crawl = async () => {
 }
 
 
-const cronJob =   cron.schedule('18 0 * * *', async () => {
+const cronJob =   cron.schedule('0 23 * * *', async () => {
   try {
     await crawl();
     const dataStream = fs.createReadStream('data.json', { encoding: 'utf-8' });
@@ -91,7 +91,6 @@ const cronJob =   cron.schedule('18 0 * * *', async () => {
 
     for await (const data of rl) {
       try {
-        console.log('Adding data:', data);
         await addData(data);
       } catch (error) {
         console.error('Error adding data:', error);
