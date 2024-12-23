@@ -16,7 +16,7 @@ const crawl = async () => {
   try {
     const linkStream = fs.createWriteStream('link.txt', { flags: 'a', encoding: 'utf-8' });
     let linkCount = 0;
-    const maxLinks = 50;
+    const maxLinks = 100;
 
     for (const type of types) {
       if (linkCount >= maxLinks) break;
@@ -78,7 +78,7 @@ const crawl = async () => {
   }
 }
 
-const cronJobCrawl  = cron.schedule('0 23 * * *', async () => {
+const cronJobCrawl  = cron.schedule('53 7 * * *', async () => {
   try {
     console.log('Crawling data...');
     await crawl();
