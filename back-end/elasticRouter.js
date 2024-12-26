@@ -12,7 +12,7 @@ router.post("/add-dma", elastic.addElasticDMA);
 router.post("/add-thk", elastic.addElasticTHK);
 router.post("/add-sol3", elastic.addElasticSOL3);
 router.post("/add-nhom5", elastic.addElasticnhom5);
-router.post("/add-acv", elastic.addElasticnhomacv);
+router.post("/add-nhom7", elastic.addElasticnhom7);
 router.post("/add-acv1", elastic.addElasticnhomacv1);
 router.post("/add-nhom11", elastic.addElasticnhom11);
 router.delete("/delete-elastic", elastic.deleteIndex);

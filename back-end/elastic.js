@@ -1,5 +1,5 @@
 const ES = require("@elastic/elasticsearch");
-const documents = require("./dataAll/CLB.json");
+const fs = require('fs');
 
 const elasticConfig = {
   ip: process.env.ELASTIC_HOST || "localhost",
@@ -118,16 +118,6 @@ const createIndex = async (req, res) => {
                 },
                 similarity: "my_bm25"
               },
-              description: {
-                type: "text",
-                fields: {
-                  origin_viet: { type: "text", analyzer: "origin_viet_analyzer" },
-                  non_viet: { type: "text", analyzer: "non_viet_analyzer" },
-                  bigrams: { type: "text", analyzer: "my_bigram_analyzer" },
-                  trigrams: { type: "text", analyzer: "my_trigram_analyzer" }
-                },
-                similarity: "lnc_ltc_similarity"
-              },
               content: {
                 type: "text",
                 fields: {
@@ -136,7 +126,7 @@ const createIndex = async (req, res) => {
                   bigrams: { type: "text", analyzer: "my_bigram_analyzer" },
                   trigrams: { type: "text", analyzer: "my_trigram_analyzer" }
                 },
-                similarity: "my_bm25"
+                similarity: "lnc_ltc_similarity"
               }
             }
           }
@@ -279,15 +269,15 @@ const addElasticnhomacv1 = async (req,res) => {
   }
 };
 
-const addElasticnhomacv = async (req,res) => {
+const addElasticnhom7 = async (req,res) => {
   try {
-    const documents = require("./dataAll/ACV.json");
+    const documents = require("./dataAll/NHOM7.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.title === doc.title && t.description === doc.description
+          t.title === doc.title
         )
     );
 
@@ -299,8 +289,6 @@ const addElasticnhomacv = async (req,res) => {
           index: 'news',
           body: {
             title: item.title,
-            description: item.description,
-            date: "ACV",
             link: item.link,
             content: item.content
           },
@@ -330,7 +318,7 @@ const addElasticnhom5 = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.song === doc.song && t.artists === doc.artists
+          t.title === doc.title
         )
     );
 
@@ -341,11 +329,9 @@ const addElasticnhom5 = async (req,res) => {
         await esClient.index({
           index: 'news',
           body: {
-            title: item.song,
-            description: item.artists,
-            date:"NHOM5",
+            title: item.title,
             link: item.link,
-            content: item.lyrics
+            content: item.content
           },
         });
       });
@@ -718,13 +704,14 @@ const addElasticnhom4 = async (req,res) => {
 
 const addElasticCLB = async (req,res) => {
   try {
-    const documents = require("./dataAll/CLB.json");
+    const documents = require("./dataALL/data.json");
     if (documents.length === 0) {
       return res.status(400).json({ message: 'Data is empty' });
     }
+    console.log("documents",documents.length)
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.title === doc.title && t.description === doc.description && t.date === doc.date
+          t.title === doc.title
         )
     );
     const batchSize = 2;
@@ -735,10 +722,8 @@ const addElasticCLB = async (req,res) => {
           index: 'news',
           body: {
             title: item.title,
-            description: item.description,
-            date: item.date,
             link: item.link,
-            content: item.paragram
+            content: item.content
           },
         });
       });
@@ -791,7 +776,6 @@ const search = async (req, res) => {
           multi_match: {
             query: text,
             fields: [
-              "description^3", // Ưu tiên cao nhất cho 'description'
               "content^2",     // Ưu tiên trung bình cho 'content'
               "title"          // Ưu tiên thấp nhất cho 'title'
             ],
@@ -804,8 +788,6 @@ const search = async (req, res) => {
       return {
         _score: item._score,
         title: item._source.title,
-        description: item._source.description,
-        date: item._source.date,
         link: item._source.link,
         content: item._source.content
       }
@@ -852,10 +834,8 @@ const addData = async (documents) => {
             index: 'news',
             body: {
               title: item.title,
-              description: item.description,
-              date: item.date,
               link: item.link,
-              content: item.paragram
+              content: item.content
             },
           });
         }
@@ -872,4 +852,4 @@ const addData = async (documents) => {
 
 
 
-module.exports = {addData,esClient,createIndex,addElasticnhom4,deleteIndex, addElasticCLB, getAllData, search ,deleteDocument ,addElasticAnimal,addElasticNhom2,addElasticKND,addElasticOT3,addElasticDMA,addElasticTHK,addElasticSOL3,addElasticnhom5,addElasticnhomacv,addElasticnhom11,addElasticnhomacv1 };
+module.exports = {addData,esClient,createIndex,addElasticnhom4,deleteIndex, addElasticCLB, getAllData, search ,deleteDocument ,addElasticAnimal,addElasticNhom2,addElasticKND,addElasticOT3,addElasticDMA,addElasticTHK,addElasticSOL3,addElasticnhom5,addElasticnhom7,addElasticnhom11,addElasticnhomacv1 };

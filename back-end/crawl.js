@@ -11,24 +11,16 @@ const appendFileAsync = promisify(fs.appendFile);
 
 const types = [2, 3, 6, 7, 10, 11, 12, 13, 16, 17];
 
-
 const crawl = async () => {
   try {
     const linkStream = fs.createWriteStream('link.txt', { flags: 'a', encoding: 'utf-8' });
-    let linkCount = 0;
-    const maxLinks = 100;
 
     for (const type of types) {
-      if (linkCount >= maxLinks) break;
       for (let i = 1; i <= 6; i++) {
-        if (linkCount >= maxLinks) break;
         const response = await axios.get(`https://tuoitre.vn/timeline/${type}/trang-${i}.htm`);
         const $ = cheerio.load(response.data);
         $('h3 a').each((_, element) => {
-          if (linkCount < maxLinks) {
-            linkStream.write(`https://tuoitre.vn${$(element).attr('href')}\n`);
-            linkCount++;
-          }
+          linkStream.write(`https://tuoitre.vn${$(element).attr('href')}\n`);
         });
       }
     }
@@ -43,7 +35,9 @@ const crawl = async () => {
 
     const dataStream = fs.createWriteStream('data.json', { flags: 'a', encoding: 'utf-8' });
 
+    let count = 0;
     for await (const url of rl) {
+      if (count >= 100) break;
       try {
         const response = await axios.get(url.trim());
         const $ = cheerio.load(response.data);
@@ -60,13 +54,12 @@ const crawl = async () => {
 
         const data = {
           title: title.replace(/\n/g, ''),
-          description: description.replace(/\n/g, ''),
-          date: time.replace(/\n/g, ''),
           link: url.trim(),
-          paragram: paragram.replace(/"/g, "'").replace(/\n/g, '').trim()
+          content: paragram.replace(/"/g, "'").replace(/\n/g, '').trim()
         };
 
         dataStream.write(`${JSON.stringify(data)},\n`);
+        count++;
       } catch (error) {
         console.error(`Error processing URL ${url.trim()}:`, error);
       }
@@ -78,7 +71,7 @@ const crawl = async () => {
   }
 }
 
-const cronJobCrawl  = cron.schedule('53 7 * * *', async () => {
+const cronJobCrawl  = cron.schedule('0 23 * * *', async () => {
   try {
     console.log('Crawling data...');
     await crawl();
