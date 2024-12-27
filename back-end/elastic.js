@@ -203,10 +203,8 @@ const addElasticnhom11 = async (req,res) => {
           index: 'news',
           body: {
             title: item.title,
-            description: item.description,
-            date: "NHOM11",
-            link: "NHOM11",
-            content: item.code
+            link: item.link,
+            content: item.content
           },
         });
       });
@@ -246,10 +244,8 @@ const addElasticnhomacv1 = async (req,res) => {
           index: 'news',
           body: {
             title: item.title,
-            description: item.description,
-            date: "ACV",
             link: item.link,
-            content: "ACV"
+            content: item.content
           },
         });
       });
@@ -371,10 +367,8 @@ const addElasticTHK = async (req,res) => {
           index: 'news',
           body: {
             title: item.title,
-            description: item.description,
-            date: "THK",
             link: item.link,
-            content: "THK"
+            content: item.content
           },
         });
       });
@@ -413,11 +407,9 @@ const addElasticSOL3 = async (req,res) => {
         await esClient.index({
           index: 'news',
           body: {
-            title: item.tenchude,
-            description: item.tenchuong,
-            date: "SOL3",
-            link: "SOL3",
-            content: item.noidung
+            title: item.title,
+            link: item.link,
+            content: item.content
           },
         });
       });
@@ -456,11 +448,9 @@ const addElasticDMA = async (req,res) => {
         await esClient.index({
           index: 'news',
           body: {
-            title: item.division_description,
-            description: item.description,
-            date: "DMA",
-            link: "DMA",
-            content: item._class_description
+            title: item.title,
+            link: item.link,
+            content: item.content
           },
         });
       });
@@ -499,11 +489,9 @@ const addElasticOT3 = async (req,res) => {
         await esClient.index({
           index: 'news',
           body: {
-            title: item.Title,
-            description: item.Author,
-            date: "OT3",
-            link: item.Link,
-            content: item.Content
+            title: item.title,
+            link: item.link,
+            content: item.content
           },
         });
       });
@@ -542,10 +530,8 @@ const addElasticKND = async (req,res) => {
         await esClient.index({
           index: 'news',
           body: {
-            title: item.type,
-            description: item.meaning,
-            date: "KND",
-            link: "KND",
+            title: item.title,
+            link: item.link,
             content: item.content
           },
         });
@@ -586,10 +572,8 @@ const addElasticNhom2 = async (req,res) => {
           index: 'news',
           body: {
             title: item.title,
-            description: item.description,
-            date: item.timeAgo,
             link: item.link,
-            content: item.keywords
+            content: item.content
           },
         });
       });
@@ -631,10 +615,8 @@ const addElasticAnimal = async (req,res) => {
         await esClient.index({
           index: 'news',
           body: {
-            title: item.categories,
-            description: item.description,
-            date: "PHM",
-            link: item.url,
+            title: item.title,
+            link: item.link,
             content: item.content
           },
         });
@@ -676,9 +658,7 @@ const addElasticnhom4 = async (req,res) => {
           index: 'news',
           body: {
             title: item.title,
-            description: item.description,
-            date: item.date,
-            link: item.url,
+            link: item.link,
             content: item.content
           },
         });
