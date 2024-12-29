@@ -191,7 +191,7 @@ const addElasticnhom11 = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.title === doc.title && t.description === doc.description
+          t.title === doc.title
         )
     );
 
@@ -232,7 +232,7 @@ const addElasticnhomacv1 = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.title === doc.title && t.description === doc.description
+          t.title === doc.title
         )
     );
 
@@ -355,7 +355,7 @@ const addElasticTHK = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.title === doc.title && t.description === doc.description
+          t.title === doc.title
         )
     );
 
@@ -396,7 +396,7 @@ const addElasticSOL3 = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.noidung === doc.noidung && t.tendemuc === doc.tendemuc
+          t.title === doc.title
         )
     );
 
@@ -437,7 +437,7 @@ const addElasticDMA = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.division_description === doc.division_description && t.description === doc.description
+          t.title === doc.title
         )
     );
 
@@ -478,7 +478,7 @@ const addElasticOT3 = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.Title === doc.Title && t.Content === doc.Content
+          t.title === doc.title
         )
     );
 
@@ -519,7 +519,7 @@ const addElasticKND = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.meaning === doc.meaning && t.content === doc.content
+          t.title === doc.title
         )
     );
 
@@ -560,7 +560,7 @@ const addElasticNhom2 = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.title === doc.title && t.description === doc.description
+          t.title === doc.title
         )
     );
 
@@ -593,9 +593,6 @@ const addElasticNhom2 = async (req,res) => {
   }
 };
 
-
-// doc file CLB.json
-
 const addElasticAnimal = async (req,res) => {
   try {
     const documents = require("./dataAll/PHM.json");
@@ -604,7 +601,7 @@ const addElasticAnimal = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.title === doc.title && t.description === doc.description
+          t.title === doc.title
         )
     );
 
@@ -646,7 +643,7 @@ const addElasticnhom4 = async (req,res) => {
     }
     const data = documents.filter((doc, index, self) =>
         index === self.findIndex((t) =>
-          t.title === doc.title && t.description === doc.description
+          t.title === doc.title
         )
     );
 
@@ -678,8 +675,6 @@ const addElasticnhom4 = async (req,res) => {
     });
   }
 };
-
-
 
 
 const addElasticCLB = async (req,res) => {
